@@ -99,4 +99,4 @@ function App() {
 function RoomRoute(){ const { slug } = useParams(); return <RoomDetailsPage slug={slug}/>; }
 function RouterApp(){ return <><Routes><Route path="/" element={<App/>}/><Route path="/rooms" element={<App/>}/><Route path="/room/:slug" element={<RoomRoute/>}/></Routes><BookingPopup/></>; }
 function SiteEntry(){ const [loading, setLoading] = useState(true); return <>{loading ? <SplashScreen onComplete={() => setLoading(false)}/> : <RouterApp/>}</>; }
-createRoot(document.getElementById('root')).render(<BrowserRouter><BookingProvider><SiteEntry/></BookingProvider></BrowserRouter>);
+createRoot(document.getElementById('root')).render(<BrowserRouter basename={import.meta.env.BASE_URL}><BookingProvider><SiteEntry/></BookingProvider></BrowserRouter>);
