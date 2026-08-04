@@ -5,10 +5,23 @@ import './rooms-experience.css';
 import standardImage from '../assets/rooms/standard-room.jpg';
 import deluxeImage from '../assets/rooms/deluxe-room.jpg';
 import suiteImage from '../assets/rooms/family-suite.jpg';
+import hotelRoom from '../assets/gallery/hotel-room.jpg';
+import comfortRoom from '../assets/gallery/comfort-room.jpg';
+import premiumSuite from '../assets/gallery/premium-suite.jpg';
+import luxuryBathroom from '../assets/gallery/luxury-bathroom.jpg';
+import bedroomInterior from '../assets/gallery/bedroom-interior.jpg';
+import executiveLounge from '../assets/gallery/executive-lounge.jpg';
 import logo from '../assets/logo/kps-inn-logo.png';
 import { useBookingSystem } from './BookingSystem';
 
 const roomImage = room => ({ standard: standardImage, deluxe: deluxeImage, 'family-suite': suiteImage })[room.slug];
+const roomGalleryImages = {
+  standard: [standardImage, hotelRoom, comfortRoom],
+  deluxe: [deluxeImage, premiumSuite, luxuryBathroom],
+  'family-suite': [suiteImage, bedroomInterior, executiveLounge],
+};
+const roomDetailPolishCss = `.details-page .sticky-book{margin-top:59px}.room-gallery-thumbs{display:flex;gap:10px;margin-top:12px}.room-gallery-thumbs button{position:relative;overflow:hidden;border:2px solid transparent;border-radius:8px;background:#fff;padding:3px;transition:transform .2s,border-color .2s,box-shadow .2s}.room-gallery-thumbs button.active{border-color:#b7935a;box-shadow:0 8px 18px rgba(62,42,22,.18)}.room-gallery-thumbs button:hover{transform:translateY(-3px)}.room-gallery-thumbs button img{display:block;width:92px;height:66px;object-fit:cover}@media(max-width:850px){.details-page .sticky-book{margin-top:0}.room-gallery-thumbs button img{width:72px;height:53px}}`;
+const roomAlignmentCss = `.details-page{align-items:start}.details-page>.sticky-book{align-self:start;margin-top:59px!important}@media(max-width:850px){.details-page>.sticky-book{margin-top:0!important}}`;
 function FacilityIcon({ name }) {
   const common = { viewBox: '0 0 24 24', width: '18', height: '18', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
   if (name === 'Wi-Fi') return <svg {...common}><path d="M3 9c5.5-4.7 12.5-4.7 18 0"/><path d="M6 12c3.8-3.2 8.2-3.2 12 0"/><path d="M9 15c1.9-1.6 4.1-1.6 6 0"/><path d="M12 19h.01"/></svg>;
@@ -22,7 +35,7 @@ function FacilityIcon({ name }) {
 }
 
 function PageHeader() {
-  return <header className="rooms-header"><Link className="details-brand" to="/"><img src={logo} alt="KPS INN logo"/><span><b>KPS INN</b><i>Comfortable rooms and friendly service</i></span></Link><nav><Link to="/">Home</Link><Link to="/#rooms">Rooms</Link></nav></header>;
+  return <header className="rooms-header"><Link className="details-brand" to="/"><img src={logo} alt="KPS INN logo"/><span><b>KPS INN</b><i>Comfortable rooms and friendly service</i></span></Link><nav><Link to="/">Home</Link><Link to="/rooms">Rooms</Link></nav></header>;
 }
 
 function GuestSelector({ adults, setAdults, children, setChildren }) {
@@ -50,6 +63,34 @@ export function RoomDetailsPage({ slug }) {
     return () => price.remove();
   }, [room.price]);
   useEffect(() => {
+    const gallery = document.querySelector('.room-gallery');
+    if (!gallery) return undefined;
+    const mainImage = gallery.querySelector('img');
+    const thumbnails = document.createElement('div');
+    thumbnails.className = 'room-gallery-thumbs';
+    roomGalleryImages[room.slug].forEach((image, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = index === 0 ? 'active' : '';
+      button.setAttribute('aria-label', `View ${room.name} photo ${index + 1}`);
+      const thumbnail = document.createElement('img');
+      thumbnail.src = image;
+      thumbnail.alt = `${room.name} view ${index + 1}`;
+      button.appendChild(thumbnail);
+      button.addEventListener('click', () => {
+        mainImage.src = image;
+        mainImage.alt = thumbnail.alt;
+        thumbnails.querySelectorAll('button').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+      });
+      thumbnails.appendChild(button);
+    });
+    gallery.appendChild(thumbnails);
+    return () => thumbnails.remove();
+  }, [room.name, room.slug]);
+  useEffect(() => { const style = document.createElement('style'); style.textContent = roomDetailPolishCss; document.head.appendChild(style); return () => style.remove(); }, []);
+  useEffect(() => { const style = document.createElement('style'); style.textContent = roomAlignmentCss; document.head.appendChild(style); return () => style.remove(); }, []);
+  useEffect(() => {
     const form = document.querySelector('.sticky-book');
     if (!form) return undefined;
     const [checkInInput, checkOutInput, promoInput] = form.querySelectorAll('input');
@@ -65,5 +106,5 @@ export function RoomDetailsPage({ slug }) {
     return () => { checkInInput.removeEventListener('change', syncCheckIn); checkOutInput.removeEventListener('change', syncCheckOut); promoInput.removeEventListener('input', syncPromo); };
   }, [checkIn, checkOut, promoCode, updateBooking]);
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }, [slug]);
-  return <><PageHeader/><main className="details-page"><div className="details-main"><Link className="breadcrumb" to="/#rooms">← ALL ROOMS</Link><div className="room-gallery"><img src={roomImage(room)} alt={room.name}/></div><p className="eyebrow dark">KPS INN ACCOMMODATION</p><h1>{room.name}</h1><p className="details-lead">{room.description}</p><section className="detail-card"><h2>Room highlights</h2><div className="highlight-grid">{room.highlights.map(item => <p key={item}>✦ {item}</p>)}</div></section><section className="detail-card amenities-policy-card"><div className="amenities-heading"><div><p className="eyebrow dark">YOUR COMFORT</p><h2>Room amenities</h2></div><span>Included with your stay</span></div><div className="amenities-grid">{room.facilities.map(item => <div className="amenity-item" key={item}><span className="facility-symbol"><FacilityIcon name={item}/></span><span>{item}</span></div>)}</div><div className="policy-panel"><div><p className="eyebrow dark">STAY WITH CONFIDENCE</p><h3>Hotel policies</h3></div><div className="policy-list"><p><span>✓</span>Flexible cancellation terms confirmed by reception.</p><p><span>✓</span>24-hour reception for guest assistance.</p></div></div></section><section className="detail-card"><h2>Guest reviews</h2><p className="review">★ {room.rating}/5 — Guests value the clean rooms, comfort, and friendly service at KPS INN.</p></section><section className="detail-card"><h2>Related rooms</h2><div className="related">{rooms.filter(item => item.slug !== room.slug).map(item => <button type="button" key={item.slug} onClick={() => navigate(`/room/${item.slug}`)}>{item.name} →</button>)}</div></section></div><aside className="sticky-book"><p className="eyebrow dark">BOOK YOUR STAY</p><h2>{room.name}</h2><label>Check-in<input type="date"/></label><label>Check-out<input type="date"/></label><GuestSelector adults={adults} setAdults={setAdults} children={children} setChildren={setChildren}/><label>Number of rooms<select value={roomCount} onChange={event => setRoomCount(Number(event.target.value))}><option value="1">1 Room</option><option value="2">2 Rooms</option><option value="3">3 Rooms</option></select></label><label>Promo code<input placeholder="Optional"/></label><div className="price-summary"><p>Room price <b>Rs. {(room.price * roomCount).toLocaleString('en-IN')}</b></p><p>Taxes <b>Rs. {(tax * roomCount).toLocaleString('en-IN')}</b></p><strong>Total <b>Rs. {total.toLocaleString('en-IN')}</b></strong></div><button className="gold-button" onClick={() => openBooking(room.name)}>BOOK NOW →</button></aside></main></>;
+  return <><PageHeader/><main className="details-page"><div className="details-main"><Link className="breadcrumb" to="/rooms">← ALL ROOMS</Link><div className="room-gallery"><img src={roomImage(room)} alt={room.name}/></div><p className="eyebrow dark">KPS INN ACCOMMODATION</p><h1>{room.name}</h1><p className="details-lead">{room.description}</p><section className="detail-card"><h2>Room highlights</h2><div className="highlight-grid">{room.highlights.map(item => <p key={item}>✦ {item}</p>)}</div></section><section className="detail-card amenities-policy-card"><div className="amenities-heading"><div><p className="eyebrow dark">YOUR COMFORT</p><h2>Room amenities</h2></div><span>Included with your stay</span></div><div className="amenities-grid">{room.facilities.map(item => <div className="amenity-item" key={item}><span className="facility-symbol"><FacilityIcon name={item}/></span><span>{item}</span></div>)}</div><div className="policy-panel"><div><p className="eyebrow dark">STAY WITH CONFIDENCE</p><h3>Hotel policies</h3></div><div className="policy-list"><p><span>✓</span>Flexible cancellation terms confirmed by reception.</p><p><span>✓</span>24-hour reception for guest assistance.</p></div></div></section><section className="detail-card"><h2>Guest reviews</h2><p className="review">★ {room.rating}/5 — Guests value the clean rooms, comfort, and friendly service at KPS INN.</p></section><section className="detail-card"><h2>Related rooms</h2><div className="related">{rooms.filter(item => item.slug !== room.slug).map(item => <button type="button" key={item.slug} onClick={() => navigate(`/rooms/${item.slug}`)}>{item.name} →</button>)}</div></section></div><aside className="sticky-book"><p className="eyebrow dark">BOOK YOUR STAY</p><h2>{room.name}</h2><label>Check-in<input type="date"/></label><label>Check-out<input type="date"/></label><GuestSelector adults={adults} setAdults={setAdults} children={children} setChildren={setChildren}/><label>Number of rooms<select value={roomCount} onChange={event => setRoomCount(Number(event.target.value))}><option value="1">1 Room</option><option value="2">2 Rooms</option><option value="3">3 Rooms</option></select></label><label>Promo code<input placeholder="Optional"/></label><div className="price-summary"><p>Room price <b>Rs. {(room.price * roomCount).toLocaleString('en-IN')}</b></p><p>Taxes <b>Rs. {(tax * roomCount).toLocaleString('en-IN')}</b></p><strong>Total <b>Rs. {total.toLocaleString('en-IN')}</b></strong></div><button className="gold-button" onClick={() => openBooking(room.name)}>BOOK NOW →</button></aside></main></>;
 }

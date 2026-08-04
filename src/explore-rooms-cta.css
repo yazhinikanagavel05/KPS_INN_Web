@@ -1,0 +1,71 @@
+/* Dimensional animated treatment for the hero's room-discovery CTA. */
+.hero .outline-button {
+  position: relative;
+  min-width: 215px;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid rgba(239, 211, 161, .7);
+  background: linear-gradient(135deg, #d9bd88 0%, #aa8959 48%, #765635 100%);
+  box-shadow: 0 14px 0 #49311f, 0 24px 34px rgba(0, 0, 0, .32), inset 0 1px 1px rgba(255, 255, 255, .42);
+  transform: perspective(700px) rotateX(5deg) translateY(0);
+  transition: transform .28s ease, box-shadow .28s ease, filter .28s ease;
+}
+
+.hero .outline-button::before {
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255, 248, 230, .28);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+.hero .outline-button::after {
+  position: absolute;
+  top: -55%;
+  bottom: -55%;
+  left: -42%;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .62), transparent);
+  content: '';
+  transform: skewX(-23deg);
+  animation: explore-rooms-shine 4.2s ease-in-out infinite;
+}
+
+.hero .outline-button span {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(46, 30, 29, .3);
+  font-size: 19px;
+  animation: explore-rooms-arrow 2.4s ease-in-out infinite;
+}
+
+.hero .outline-button:hover,
+.hero .outline-button:focus-visible {
+  background: linear-gradient(135deg, #ead2a2 0%, #bd9862 48%, #85603c 100%);
+  box-shadow: 0 7px 0 #49311f, 0 18px 38px rgba(0, 0, 0, .36), inset 0 1px 1px rgba(255, 255, 255, .55);
+  filter: saturate(1.08);
+  transform: perspective(700px) rotateX(0) translateY(7px);
+}
+
+.hero .outline-button:hover span,
+.hero .outline-button:focus-visible span {
+  transform: translateX(4px) scale(1.08);
+  background: rgba(46, 30, 29, .44);
+}
+
+.hero .outline-button:active {
+  box-shadow: 0 2px 0 #49311f, 0 7px 18px rgba(0, 0, 0, .28);
+  transform: perspective(700px) translateY(12px);
+}
+
+@keyframes explore-rooms-arrow { 50% { transform: translateX(3px); } }
+@keyframes explore-rooms-shine { 0%, 58% { left: -42%; } 82%, 100% { left: 122%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero .outline-button::after,
+  .hero .outline-button span { animation: none; }
+}
