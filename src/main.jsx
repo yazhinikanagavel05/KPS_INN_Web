@@ -85,7 +85,7 @@ function App() {
         { label: 'Home', href: '/' },
         { label: 'About', href: '/about' },
         { label: 'Rooms', href: '/rooms' },
-        { label: 'Gallery', href: '/#gallery' },
+        { label: 'Gallery', href: '/gallery' },
         { label: 'Booking', href: '/rooms' },
         { label: 'Contact', href: '/#contact' }
       ].map(item => item.href.startsWith('/') ? <Link onClick={() => setMenu(false)} to={item.href} key={item.label}>{item.label}</Link> : <a onClick={() => setMenu(false)} href={item.href} key={item.label}>{item.label}</a>)}<button onClick={() => { setMenu(false); searchRooms(); }}>BOOK NOW <span>-&gt;</span></button></nav>

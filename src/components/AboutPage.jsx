@@ -41,7 +41,7 @@ function AboutPage() {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/rooms">Rooms</Link>
-          <a href="/#gallery">Gallery</a>
+          <Link to="/gallery">Gallery</Link>
           <a href="/#contact">Contact</a>
         </nav>
       </header>
