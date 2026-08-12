@@ -435,11 +435,8 @@ header .brand i {
 header nav {
   gap: 5px;
   padding: 6px;
-  border: 1px solid rgba(235, 215, 177, .2);
-  border-radius: 3px;
-  background: rgba(10, 13, 25, .28);
-  backdrop-filter: blur(14px);
-}
+  background: transparent;
+} 
 
 header nav a {
   padding: 11px 13px;
@@ -451,8 +448,8 @@ header nav a {
 }
 
 header nav a:hover {
-  background: rgba(197, 153, 76, .18);
-  color: #e7be76;
+  background: rgba(194, 36, 46, .22);
+  color: #d25638;
 }
 
 header nav button {

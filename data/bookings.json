@@ -1,0 +1,18 @@
+[
+  {
+    "roomSlug": "family-suite",
+    "roomName": "Family Suite",
+    "guestName": "Yazhini Kanagavel",
+    "phone": "9876543210",
+    "email": "yazhinikanagavel@gmail.com",
+    "specialRequest": "",
+    "checkIn": "2026-08-12",
+    "checkOut": "2026-08-13",
+    "roomCount": 1,
+    "adults": 3,
+    "children": 0,
+    "id": "bk-1786539742741-xuspm",
+    "bookingDate": "2026-08-12T13:02:22.741Z",
+    "status": "Pending"
+  }
+]

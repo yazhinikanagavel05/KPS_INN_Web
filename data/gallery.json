@@ -1,0 +1,72 @@
+[
+  {
+    "id": "img-1724832000000-abcde",
+    "title": "Hotel Room",
+    "altText": "KPS INN hotel room",
+    "filename": "image-1786539391718.png",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000001-abcde",
+    "title": "Bedroom Interior",
+    "altText": "KPS INN bedroom interior",
+    "filename": "bedroom-interior.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000002-abcde",
+    "title": "Hotel Building",
+    "altText": "KPS INN building exterior",
+    "filename": "hotel-building.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000003-abcde",
+    "title": "Restaurant Dining",
+    "altText": "KPS INN restaurant dining",
+    "filename": "restaurant-dining.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000004-abcde",
+    "title": "Hotel Lobby",
+    "altText": "KPS INN lobby",
+    "filename": "hotel-lobby.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000005-abcde",
+    "title": "Comfort Room",
+    "altText": "KPS INN comfort room",
+    "filename": "comfort-room.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000006-abcde",
+    "title": "Premium Suite",
+    "altText": "KPS INN premium suite",
+    "filename": "premium-suite.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000007-abcde",
+    "title": "Executive Lounge",
+    "altText": "KPS INN executive lounge",
+    "filename": "executive-lounge.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000008-abcde",
+    "title": "Luxury Bathroom",
+    "altText": "KPS INN luxury bathroom",
+    "filename": "luxury-bathroom.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "img-1724832000009-abcde",
+    "title": "Pool Layout",
+    "altText": "KPS INN pool layout",
+    "filename": "pool-layout.jpg",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]

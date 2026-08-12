@@ -1,0 +1,288 @@
+/* ============================================================
+   KPS INN — Button Design System
+   Design tokens are defined on :root in styles.css
+   (--btn-primary-*, --btn-secondary-*, --btn-accent-*, --btn-*).
+   This file loads last so every button across the site shares
+   one consistent, premium interaction model.
+   ============================================================ */
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- Shared interaction base for all action buttons ---- */
+.gold-button,
+.outline-button,
+.gallery-preview-link,
+.about-copy .text-link,
+.room-link.view-details,
+.related button,
+header nav button {
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease, color .22s ease;
+}
+
+.gold-button:active,
+.outline-button:active,
+.gallery-preview-link:active,
+.about-copy .text-link:active,
+.room-link.view-details:active,
+.related button:active,
+header nav button:active {
+  transform: scale(.98);
+}
+
+/* ---- Accessible focus ring (keyboard only) ---- */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--btn-focus);
+  outline-offset: 3px;
+}
+
+/* ---- Accent (gold) : header BOOK NOW ---- */
+header nav button {
+  border-radius: var(--btn-radius);
+  min-height: 42px;
+  padding: 12px 18px;
+  font: 700 10px var(--sans);
+  letter-spacing: 1.5px;
+  cursor: pointer;
+}
+
+header nav button:hover {
+  transform: translateY(-1px);
+}
+
+/* ---- Tertiary / text buttons ---- */
+.text-link,
+.room-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  transition: color .25s ease;
+}
+
+.text-link:hover,
+.room-link:hover {
+  color: #9c7840;
+}
+
+.text-link span,
+.room-link span {
+  display: inline-block;
+  line-height: 1;
+  transition: transform .3s ease;
+}
+
+.text-link:hover span,
+.room-link:hover span {
+  transform: translateX(4px);
+}
+
+.breadcrumb {
+  padding: 6px 2px;
+  font-weight: 700;
+  transition: color .25s ease;
+}
+
+.breadcrumb:hover {
+  color: #4a3316;
+}
+
+/* ---- Bordered detail chips ---- */
+.room-link.view-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 18px;
+  min-height: 50px;
+  border: 1px solid rgba(157, 122, 69, .4);
+  background: #fffaf2;
+  border-radius: var(--btn-radius);
+  color: #251c14;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  box-shadow: 0 8px 18px rgba(87, 56, 22, .08);
+}
+
+.room-link.view-details:hover {
+  background: #1d1813;
+  color: #fff8eb;
+  border-color: #a38355;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(87, 56, 22, .16);
+}
+
+.room-link.view-details span {
+  color: #251c14;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.room-link.view-details:hover span {
+  color: #fff8eb;
+}
+
+.related button {
+  border: 1px solid #cdbb9d;
+  background: #fffaf2;
+  color: #251c14;
+  padding: 12px 18px;
+  min-height: 44px;
+  border-radius: var(--btn-radius);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+}
+
+.related button:hover {
+  border-color: #a37a40;
+  background: #9d7a45;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px rgba(87, 56, 22, .16);
+}
+
+.gallery-preview-link {
+  border-radius: var(--btn-radius);
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark solid link button used on the home "About" section. */
+.about-copy .text-link {
+  border-radius: var(--btn-radius);
+  min-height: 52px;
+}
+
+/* ---- Guest stepper controls (+ / -) ---- */
+.guest-selector button,
+.guest-control button {
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.guest-selector button:hover,
+.guest-control button:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+  box-shadow: 0 5px 12px rgba(87, 56, 22, .24);
+  transform: scale(1.1);
+}
+
+.guest-selector button:active,
+.guest-control button:active {
+  transform: scale(.94);
+}
+
+/* ---- Modal / gallery / slider controls ---- */
+.modal .close,
+.gallery-lightbox-close,
+.gallery-lightbox-nav,
+.luxury-slider-arrow,
+.lightbox button {
+  transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.gallery-lightbox-nav:hover,
+.gallery-lightbox-close:hover,
+.luxury-slider-arrow:hover {
+  border-color: #e7c181;
+  background: rgba(184, 147, 90, .38);
+  transform: scale(1.08);
+}
+
+.modal .close:hover,
+.lightbox button:hover {
+  color: #b7935a;
+  transform: scale(1.1);
+}
+
+.luxury-slider-pagination button {
+  transition: transform .2s ease, background .2s ease;
+}
+
+.luxury-slider-pagination button:hover {
+  transform: translateY(-2px);
+}
+
+.room-gallery button {
+  transition: border-color .2s ease, transform .2s ease;
+}
+
+.room-gallery button:hover {
+  border-color: #a37a40;
+}
+
+/* ---- Floating call button ---- */
+.whatsapp {
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+}
+
+.whatsapp:hover {
+  background: #9d7a45;
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 12px 24px rgba(87, 56, 22, .3);
+}
+
+.whatsapp:active {
+  transform: scale(.96);
+}
+
+/* ---- Mobile hamburger ---- */
+.hamburger {
+  cursor: pointer;
+  transition: color .22s ease, transform .22s ease;
+}
+
+.hamburger:hover {
+  color: #e6c58a;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .gold-button,
+  .outline-button,
+  .gallery-preview-link,
+  .about-copy .text-link,
+  .room-link.view-details,
+  .related button,
+  header nav button,
+  .text-link span,
+  .room-link span,
+  .guest-selector button,
+  .guest-control button,
+  .gallery-lightbox-nav,
+  .gallery-lightbox-close,
+  .modal .close,
+  .lightbox button,
+  .luxury-slider-arrow,
+  .luxury-slider-pagination button,
+  .room-gallery button,
+  .whatsapp,
+  .hamburger {
+    transition: none !important;
+  }
+
+  .gold-button:hover,
+  .outline-button:hover,
+  .gallery-preview-link:hover,
+  .about-copy .text-link:hover,
+  .room-link.view-details:hover,
+  .related button:hover,
+  header nav button:hover {
+    transform: none;
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo/kps-inn-logo.png';
+import { useGoToBooking } from '../lib/bookingNav';
+import SiteHeader from './SiteHeader';
 import reception from '../assets/gallery/hero-luxury.png';
 import hotelLobby from '../assets/gallery/hotel-lobby.jpg';
 import hotelBuilding from '../assets/gallery/hotel-building.jpg';
@@ -23,28 +24,14 @@ const highlights = [
 ];
 
 function AboutPage() {
+  const goToBooking = useGoToBooking();
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
     <div className="about-page-shell">
-      <header className="scrolled">
-        <Link className="brand" to="/" aria-label="KPS INN home">
-          <img className="hotel-logo" src={logo} alt="KPS INN logo" />
-          <span>
-            <b>KPS INN</b>
-            <i>Comfortable rooms and friendly service</i>
-          </span>
-        </Link>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-          <Link to="/rooms">Rooms</Link>
-          <Link to="/gallery">Gallery</Link>
-          <a href="/#contact">Contact</a>
-        </nav>
-      </header>
+      <SiteHeader/>
 
       <main className="about-page-main">
         <section className="about-page-hero">
@@ -56,7 +43,7 @@ function AboutPage() {
               neatly kept spaces, and a peaceful base for work or travel.
             </p>
             <div className="about-page-actions">
-              <Link className="gold-button" to="/rooms">EXPLORE ROOMS <span>-&gt;</span></Link>
+              <Link className="gold-button" to="/" onClick={(event) => { event.preventDefault(); goToBooking(); }}>EXPLORE ROOMS <span>-&gt;</span></Link>
               <a className="outline-button" href="tel:+919944932516">CALL US</a>
             </div>
           </div>
@@ -118,7 +105,7 @@ function AboutPage() {
             <h2>Reserve a room shaped around your pace.</h2>
             <p>From a smooth arrival to a restful evening, every part of your stay is designed to feel easy and thoughtful.</p>
           </div>
-          <Link className="gold-button" to="/rooms">BOOK YOUR STAY <span>-&gt;</span></Link>
+          <Link className="gold-button" to="/" onClick={(event) => { event.preventDefault(); goToBooking(); }}>BOOK YOUR STAY <span>-&gt;</span></Link>
         </section>
       </main>
 

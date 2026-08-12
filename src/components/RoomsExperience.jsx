@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import rooms from '../data/rooms.json';
+import SiteHeader from './SiteHeader';
 import './rooms-experience.css';
 import standardImage from '../assets/rooms/standard-room.jpg';
 import deluxeImage from '../assets/rooms/deluxe-room.jpg';
@@ -11,7 +12,6 @@ import premiumSuite from '../assets/gallery/premium-suite.jpg';
 import luxuryBathroom from '../assets/gallery/luxury-bathroom.jpg';
 import bedroomInterior from '../assets/gallery/bedroom-interior.jpg';
 import executiveLounge from '../assets/gallery/executive-lounge.jpg';
-import logo from '../assets/logo/kps-inn-logo.png';
 import { useBookingSystem } from './BookingSystem';
 
 const roomImage = room => ({ standard: standardImage, deluxe: deluxeImage, 'family-suite': suiteImage })[room.slug];
@@ -34,10 +34,6 @@ function FacilityIcon({ name }) {
   return <svg {...common}><circle cx="12" cy="6" r="2"/><path d="M4 21v-7a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v7M8 21v-5h8v5"/></svg>;
 }
 
-function PageHeader() {
-  return <header className="rooms-header"><Link className="details-brand" to="/"><img src={logo} alt="KPS INN logo"/><span><b>KPS INN</b><i>Comfortable rooms and friendly service</i></span></Link><nav><Link to="/">Home</Link><Link to="/rooms">Rooms</Link></nav></header>;
-}
-
 function GuestSelector({ adults, setAdults, children, setChildren }) {
   return <div className="guest-selectors"><div className="guest-selector"><span>Adults</span><button type="button" onClick={() => setAdults(Math.max(1, adults - 1))}>−</button><b>{adults}</b><button type="button" onClick={() => setAdults(adults + 1)}>+</button></div><div className="guest-selector"><span>Children</span><button type="button" onClick={() => setChildren(Math.max(0, children - 1))}>−</button><b>{children}</b><button type="button" onClick={() => setChildren(children + 1)}>+</button></div></div>;
 }
@@ -45,14 +41,14 @@ function GuestSelector({ adults, setAdults, children, setChildren }) {
 export function RoomDetailsPage({ slug }) {
   const room = rooms.find(item => item.slug === slug) || rooms[0];
   const navigate = useNavigate();
-  const { openBooking, bookingDetails, updateBooking, setSelectedRoom } = useBookingSystem();
+  const { openBooking, bookingDetails, updateBooking, setSelectedRoom, setRoomPreference } = useBookingSystem();
   const { adults, children, roomCount, checkIn, checkOut, promoCode } = bookingDetails;
   const setAdults = value => updateBooking({ adults: value });
   const setChildren = value => updateBooking({ children: value });
   const setRoomCount = value => updateBooking({ roomCount: value });
   const tax = Math.round(room.price * 0.12);
   const total = (room.price + tax) * roomCount;
-  useEffect(() => { setSelectedRoom(room.name); }, [room.name, setSelectedRoom]);
+  useEffect(() => { setSelectedRoom(room.name); setRoomPreference(room.slug); }, [room.name, room.slug, setSelectedRoom, setRoomPreference]);
   useEffect(() => {
     const gallery = document.querySelector('.room-gallery');
     if (!gallery) return undefined;
@@ -106,5 +102,5 @@ export function RoomDetailsPage({ slug }) {
     return () => { checkInInput.removeEventListener('change', syncCheckIn); checkOutInput.removeEventListener('change', syncCheckOut); promoInput.removeEventListener('input', syncPromo); };
   }, [checkIn, checkOut, promoCode, updateBooking]);
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); }, [slug]);
-  return <><PageHeader/><main className="details-page"><div className="details-main"><Link className="breadcrumb" to="/rooms">← ALL ROOMS</Link><div className="room-gallery"><img src={roomImage(room)} alt={room.name}/></div><p className="eyebrow dark">KPS INN ACCOMMODATION</p><h1>{room.name}</h1><p className="details-lead">{room.description}</p><section className="detail-card"><h2>Room highlights</h2><div className="highlight-grid">{room.highlights.map(item => <p key={item}>✦ {item}</p>)}</div></section><section className="detail-card amenities-policy-card"><div className="amenities-heading"><div><p className="eyebrow dark">YOUR COMFORT</p><h2>Room amenities</h2></div><span>Included with your stay</span></div><div className="amenities-grid">{room.facilities.map(item => <div className="amenity-item" key={item}><span className="facility-symbol"><FacilityIcon name={item}/></span><span>{item}</span></div>)}</div><div className="policy-panel"><div><p className="eyebrow dark">STAY WITH CONFIDENCE</p><h3>Hotel policies</h3></div><div className="policy-list"><p><span>✓</span>Flexible cancellation terms confirmed by reception.</p><p><span>✓</span>24-hour reception for guest assistance.</p></div></div></section><section className="detail-card"><h2>Guest reviews</h2><p className="review">★ {room.rating}/5 — Guests value the clean rooms, comfort, and friendly service at KPS INN.</p></section><section className="detail-card"><h2>Related rooms</h2><div className="related">{rooms.filter(item => item.slug !== room.slug).map(item => <button type="button" key={item.slug} onClick={() => navigate(`/rooms/${item.slug}`)}>{item.name} →</button>)}</div></section></div><aside className="sticky-book"><p className="eyebrow dark">BOOK YOUR STAY</p><h2>{room.name}</h2><label>Check-in<input type="date"/></label><label>Check-out<input type="date"/></label><GuestSelector adults={adults} setAdults={setAdults} children={children} setChildren={setChildren}/><label>Number of rooms<select value={roomCount} onChange={event => setRoomCount(Number(event.target.value))}><option value="1">1 Room</option><option value="2">2 Rooms</option><option value="3">3 Rooms</option></select></label><label>Promo code<input placeholder="Optional"/></label><div className="price-summary"><p>Room price <b>Rs. {(room.price * roomCount).toLocaleString('en-IN')}</b></p><p>Taxes <b>Rs. {(tax * roomCount).toLocaleString('en-IN')}</b></p><strong>Total <b>Rs. {total.toLocaleString('en-IN')}</b></strong></div><button className="gold-button" onClick={() => openBooking(room.name)}>BOOK NOW →</button></aside></main></>;
+  return <><SiteHeader/><main className="details-page"><div className="details-main"><Link className="breadcrumb" to="/">← BACK TO HOME</Link><div className="room-gallery"><img src={roomImage(room)} alt={room.name}/></div><p className="eyebrow dark">KPS INN ACCOMMODATION</p><h1>{room.name}</h1><p className="details-lead">{room.description}</p><section className="detail-card"><h2>Room highlights</h2><div className="highlight-grid">{room.highlights.map(item => <p key={item}>✦ {item}</p>)}</div></section><section className="detail-card amenities-policy-card"><div className="amenities-heading"><div><p className="eyebrow dark">YOUR COMFORT</p><h2>Room amenities</h2></div><span>Included with your stay</span></div><div className="amenities-grid">{room.facilities.map(item => <div className="amenity-item" key={item}><span className="facility-symbol"><FacilityIcon name={item}/></span><span>{item}</span></div>)}</div><div className="policy-panel"><div><p className="eyebrow dark">STAY WITH CONFIDENCE</p><h3>Hotel policies</h3></div><div className="policy-list"><p><span>✓</span>Flexible cancellation terms confirmed by reception.</p><p><span>✓</span>24-hour reception for guest assistance.</p></div></div></section><section className="detail-card"><h2>Guest reviews</h2><p className="review">★ {room.rating}/5 — Guests value the clean rooms, comfort, and friendly service at KPS INN.</p></section><section className="detail-card"><h2>Related rooms</h2><div className="related">{rooms.filter(item => item.slug !== room.slug).map(item => <button type="button" key={item.slug} onClick={() => navigate(`/rooms/${item.slug}`)}>{item.name} →</button>)}</div></section></div><aside className="sticky-book"><p className="eyebrow dark">BOOK YOUR STAY</p><h2>{room.name}</h2><label>Check-in<input type="date"/></label><label>Check-out<input type="date"/></label><GuestSelector adults={adults} setAdults={setAdults} children={children} setChildren={setChildren}/><label>Number of rooms<select value={roomCount} onChange={event => setRoomCount(Number(event.target.value))}><option value="1">1 Room</option><option value="2">2 Rooms</option><option value="3">3 Rooms</option></select></label><label>Promo code<input placeholder="Optional"/></label><div className="price-summary"><p>Room price <b>Rs. {(room.price * roomCount).toLocaleString('en-IN')}</b></p><p>Taxes <b>Rs. {(tax * roomCount).toLocaleString('en-IN')}</b></p><strong>Total <b>Rs. {total.toLocaleString('en-IN')}</b></strong></div><button className="gold-button" onClick={() => openBooking(room.name)}>BOOK NOW →</button></aside></main></>;
 }

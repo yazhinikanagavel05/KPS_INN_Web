@@ -1,0 +1,57 @@
+[
+  {
+    "id": "slide-1724832000000-abcde",
+    "image": "/uploads/hero/hero-luxury.png",
+    "eyebrow": "KPS INN | KARUR",
+    "title": "Experience Timeless Luxury",
+    "copy": "Where elegance meets comfort. Discover a stay crafted with world-class hospitality and unforgettable experiences.",
+    "cta": "Book Your Stay",
+    "ctaTarget": "book",
+    "motion": "zoom",
+    "order": 0
+  },
+  {
+    "id": "slide-1724832001000-abcde",
+    "image": "/uploads/hero/premium-suite.jpg",
+    "eyebrow": "REST, REIMAGINED",
+    "title": "Luxury Rooms & Suites",
+    "copy": "Wake up to breathtaking interiors, premium comfort, and exceptional attention to every detail.",
+    "cta": "View Rooms",
+    "ctaTarget": "book",
+    "motion": "pan",
+    "order": 1
+  },
+  {
+    "id": "slide-1724832002000-abcde",
+    "image": "/uploads/hero/pool-layout.jpg",
+    "eyebrow": "A MOMENT FOR YOU",
+    "title": "Relax. Refresh. Rejuvenate.",
+    "copy": "Escape into serenity with our infinity pool, spa, wellness center, and premium leisure facilities.",
+    "cta": "Explore Amenities",
+    "ctaTarget": "/#amenities",
+    "motion": "parallax",
+    "order": 2
+  },
+  {
+    "id": "slide-1724832003000-abcde",
+    "image": "/uploads/hero/image-1786539513760.jpg",
+    "eyebrow": "DINING AT KPS INN",
+    "title": "An Unforgettable Culinary Experience",
+    "copy": "Taste handcrafted cuisine prepared by our expert chefs in an elegant dining atmosphere.",
+    "cta": "Reserve a Table",
+    "ctaTarget": "/#contact",
+    "motion": "zoom",
+    "order": 3
+  },
+  {
+    "id": "slide-1724832004000-abcde",
+    "image": "/uploads/hero/hero-luxury.png",
+    "eyebrow": "YOUR NEXT ESCAPE",
+    "title": "Create Memories That Last Forever",
+    "copy": "Whether it's a vacation, honeymoon, family getaway, or business trip, experience hospitality beyond expectations.",
+    "cta": "Book Now",
+    "ctaTarget": "book",
+    "motion": "glow",
+    "order": 4
+  }
+]

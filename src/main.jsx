@@ -1,115 +1,288 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes, useParams } from 'react-router-dom';
 import './styles.css';
 import './booking.css';
-import { RoomDetailsPage } from './components/RoomsExperience';
-import RoomsPage from './components/RoomsPage';
-import { BookingPopup, BookingProvider, useBookingSystem } from './components/BookingSystem';
+import './buttons.css';
 import './components/room-card-alignment.css';
+import { RoomDetailsPage } from './components/RoomsExperience';
+import { BookingPopup, BookingProvider } from './components/BookingSystem';
+import { useGoToBooking } from './lib/bookingNav';
+import { performPendingContactScroll } from './lib/contactNav';
+import SiteHeader from './components/SiteHeader';
+import HeroSlider from './components/HeroSlider';
 import SplashScreen from './components/SplashScreen';
 import AboutPage from './components/AboutPage';
+import AvailabilitySearch from './components/AvailabilitySearch';
+import DashboardPage from './components/DashboardPage';
+import {
+  bookingPopupCss,
+  experiencePolishCss,
+  galleryEnhancementCss,
+  galleryExperienceCss,
+  sectionRhythmCss,
+} from './lib/siteStyles';
+
 import logo from './assets/logo/kps-inn-logo.png';
-import reception from './assets/gallery/hero-luxury.png';
+import hotelLobby from './assets/gallery/hotel-lobby.jpg';
+import hotelBuilding from './assets/gallery/hotel-building.jpg';
+import poolLayout from './assets/gallery/pool-layout.jpg';
 import hotelRoom from './assets/gallery/hotel-room.jpg';
 import bedroomInterior from './assets/gallery/bedroom-interior.jpg';
-import hotelBuilding from './assets/gallery/hotel-building.jpg';
 import restaurantDining from './assets/gallery/restaurant-dining.jpg';
-import hotelLobby from './assets/gallery/hotel-lobby.jpg';
 import comfortRoom from './assets/gallery/comfort-room.jpg';
 import premiumSuite from './assets/gallery/premium-suite.jpg';
 import executiveLounge from './assets/gallery/executive-lounge.jpg';
 import luxuryBathroom from './assets/gallery/luxury-bathroom.jpg';
-import poolLayout from './assets/gallery/pool-layout.jpg';
-import rooms from './data/rooms.json';
 
-const gallery = [hotelRoom, bedroomInterior, hotelBuilding, restaurantDining, hotelLobby, comfortRoom, premiumSuite, executiveLounge, luxuryBathroom, poolLayout];
-const facilityIcons = { 'Free WiFi': '◉', 'Air Conditioning': '❄', 'Smart TV': '▣', 'Parking': '◈', 'Tea service': '☕', 'Bath amenities': '◌', 'Family seating': '◒', 'Dining': '◈' };
 const Icon = ({ children }) => <span className="icon" aria-hidden="true">{children}</span>;
 
-const heroSlides = [
-  { image: hotelBuilding, eyebrow: 'KPS INN | KARUR', title: 'Experience Timeless Luxury', copy: 'Where elegance meets comfort. Discover a stay crafted with world-class hospitality and unforgettable experiences.', primary: 'Book Rooms', book: true, to: '/rooms', motion: 'zoom' },
-  { image: premiumSuite, eyebrow: 'REST, REIMAGINED', title: 'Luxury Rooms & Suites', copy: 'Wake up to breathtaking interiors, premium comfort, and exceptional attention to every detail.', primary: 'Explore Rooms', to: '/rooms', motion: 'pan' },
-  { image: poolLayout, eyebrow: 'A MOMENT FOR YOU', title: 'Relax. Refresh. Rejuvenate.', copy: 'Escape into serenity with our infinity pool, spa, wellness center, and premium leisure facilities.', primary: 'Explore Rooms', to: '/rooms', motion: 'parallax' },
-  { image: restaurantDining, eyebrow: 'DINING AT KPS INN', title: 'An Unforgettable Culinary Experience', copy: 'Taste handcrafted cuisine prepared by our expert chefs in an elegant dining atmosphere.', primary: 'Explore Rooms', to: '/rooms', motion: 'zoom' },
-  { image: reception, eyebrow: 'YOUR NEXT ESCAPE', title: 'Create Memories That Last Forever', copy: "Whether it's a vacation, honeymoon, family getaway, or business trip, experience hospitality beyond expectations.", primary: 'Book Rooms', book: true, to: '/rooms', motion: 'glow' },
+const fallbackGallery = [
+  hotelRoom,
+  bedroomInterior,
+  hotelBuilding,
+  restaurantDining,
+  hotelLobby,
+  comfortRoom,
+  premiumSuite,
+  executiveLounge,
+  luxuryBathroom,
+  poolLayout,
 ];
 
-const heroSliderCss = `.hero{display:none}.luxury-hero-slider{position:relative;height:100vh;min-height:640px;overflow:hidden;background:#0e0b0d;color:#fff9ef;isolation:isolate}.luxury-hero-slides,.luxury-hero-slide,.luxury-hero-slide>img,.luxury-hero-overlay{position:absolute;inset:0}.luxury-hero-slide{opacity:0;visibility:hidden;transition:opacity 1.15s ease,visibility 1.15s ease}.luxury-hero-slide.is-active{opacity:1;visibility:visible}.luxury-hero-slide>img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);will-change:transform}.luxury-hero-slide.is-active.zoom>img,.luxury-hero-slide.is-active.glow>img{animation:luxury-ken-burns 7s ease-out both}.luxury-hero-slide.is-active.pan>img{animation:luxury-pan 7s ease-out both}.luxury-hero-slide.is-active.parallax>img{animation:luxury-parallax 7s ease-out both}.luxury-hero-overlay{background:linear-gradient(90deg,rgba(10,6,11,.88),rgba(15,8,15,.62) 43%,rgba(12,19,33,.22) 76%),linear-gradient(0deg,rgba(5,4,7,.58),transparent 58%)}.glow .luxury-hero-overlay{background:radial-gradient(circle at 28% 43%,rgba(197,150,84,.19),transparent 29%),linear-gradient(90deg,rgba(10,6,11,.91),rgba(15,8,15,.52) 55%,rgba(7,16,33,.34))}.luxury-hero-copy{position:relative;z-index:2;display:flex;width:min(690px,83vw);height:100%;margin-left:12vw;padding:160px 0 126px;flex-direction:column;justify-content:center}.luxury-hero-kicker{margin:0 0 21px;color:#ddbd83;font:700 10px var(--sans);letter-spacing:3px;opacity:0;transform:translateY(20px)}.luxury-hero-copy h1{max-width:690px;margin:0;color:#fff9ef;font:600 clamp(47px,6.2vw,92px)/.98 var(--serif);letter-spacing:-.035em;text-shadow:0 8px 30px rgba(0,0,0,.36);opacity:0;transform:translateY(32px)}.luxury-hero-description{max-width:520px;margin:27px 0 35px;color:#f2eadf;font-size:16px;line-height:1.75;text-shadow:0 2px 12px rgba(0,0,0,.35);opacity:0;transform:translateY(25px)}.luxury-hero-actions{display:flex;flex-wrap:wrap;gap:14px;opacity:0;transform:translateY(22px)}.is-active .luxury-hero-kicker{animation:luxury-copy-in .75s .18s both}.is-active .luxury-hero-copy h1{animation:luxury-copy-in .85s .3s both}.is-active .luxury-hero-description{animation:luxury-copy-in .8s .48s both}.is-active .luxury-hero-actions{animation:luxury-copy-in .8s .62s both}.luxury-primary-cta,.luxury-secondary-cta{display:inline-flex;min-height:54px;align-items:center;justify-content:center;gap:20px;padding:0 24px;border-radius:2px;color:#fffaf0;font:700 10px var(--sans);letter-spacing:1.5px;text-decoration:none;text-transform:uppercase;transition:transform .25s,box-shadow .25s,background .25s;cursor:pointer}.luxury-primary-cta{border:1px solid rgba(242,214,158,.77);background:linear-gradient(135deg,rgba(184,146,84,.92),rgba(112,72,40,.94));box-shadow:0 12px 25px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.22)}.luxury-primary-cta span{font-size:18px;transition:transform .25s}.luxury-primary-cta:hover{box-shadow:0 17px 30px rgba(0,0,0,.36),0 0 25px rgba(218,176,104,.2);transform:translateY(-3px)}.luxury-primary-cta:hover span{transform:translateX(4px)}.luxury-secondary-cta{border:1px solid rgba(255,255,255,.38);background:rgba(14,11,15,.27);backdrop-filter:blur(10px)}.luxury-secondary-cta:hover{border-color:#e5c489;background:rgba(213,174,108,.16);transform:translateY(-3px)}.luxury-hero-controls{position:absolute;z-index:3;right:5.5vw;bottom:44px;display:flex;align-items:center;gap:20px}.luxury-slider-arrow{display:grid;width:42px;height:42px;place-items:center;border:1px solid rgba(255,255,255,.38);border-radius:50%;background:rgba(11,9,12,.25);color:#fff;font-size:18px;backdrop-filter:blur(10px);cursor:pointer}.luxury-slider-pagination{display:flex;gap:8px}.luxury-slider-pagination button{display:grid;width:23px;height:20px;place-items:center;padding:0;border:0;background:transparent;cursor:pointer}.luxury-slider-pagination span{width:100%;height:1px;background:rgba(255,255,255,.42);transition:.3s}.luxury-slider-pagination button.is-active span{background:#e6c285;transform:scaleX(1.35)}.luxury-hero-count{position:absolute;z-index:3;right:5.7vw;top:49%;display:grid;gap:5px;margin:0;color:rgba(255,255,255,.65);font-size:10px;letter-spacing:2px;text-align:right}.luxury-hero-count b{color:#e6c285;font:500 26px var(--serif)}@keyframes luxury-ken-burns{from{transform:scale(1.04)}to{transform:scale(1.15)}}@keyframes luxury-pan{from{transform:scale(1.1) translateX(-2.2%)}to{transform:scale(1.1) translateX(2.2%)}}@keyframes luxury-parallax{from{transform:scale(1.12) translate3d(0,-1.5%,0)}to{transform:scale(1.06) translate3d(-1.8%,1%,0)}}@keyframes luxury-copy-in{to{opacity:1;transform:translateY(0)}}@media(max-width:800px){.luxury-hero-slider{min-height:620px}.luxury-hero-overlay{background:linear-gradient(90deg,rgba(10,6,11,.8),rgba(10,6,11,.38)),linear-gradient(0deg,rgba(5,4,7,.69),transparent 65%)}.luxury-hero-copy{width:auto;margin:0 8vw;padding:110px 0 130px}.luxury-hero-copy h1{font-size:clamp(45px,13vw,64px)}.luxury-hero-description{font-size:14px;margin:21px 0 29px}.luxury-hero-actions{gap:10px}.luxury-primary-cta,.luxury-secondary-cta{min-height:50px;padding:0 17px;font-size:9px}.luxury-hero-controls{right:8vw;bottom:30px;gap:12px}.luxury-slider-arrow{width:37px;height:37px}.luxury-hero-count{display:none}}@media(prefers-reduced-motion:reduce){.luxury-hero-slide,.luxury-hero-kicker,.luxury-hero-copy h1,.luxury-hero-description,.luxury-hero-actions,.luxury-hero-slide>img{animation:none!important;transition:none!important}.luxury-hero-kicker,.luxury-hero-copy h1,.luxury-hero-description,.luxury-hero-actions{opacity:1;transform:none}}`;
+function useGalleryImages() {
+  const [images, setImages] = useState([]);
 
-const heroCtaCss = `.luxury-primary-cta{position:relative;min-width:200px;overflow:hidden;border:1px solid rgba(239,211,161,.7);background:linear-gradient(135deg,#d9bd88 0%,#aa8959 48%,#765635 100%);box-shadow:0 14px 0 #49311f,0 24px 34px rgba(0,0,0,.32),inset 0 1px 1px rgba(255,255,255,.42);transform:perspective(700px) rotateX(5deg);transition:transform .28s ease,box-shadow .28s ease,filter .28s ease}.luxury-primary-cta:before{position:absolute;inset:3px;border:1px solid rgba(255,248,230,.28);content:'';pointer-events:none}.luxury-primary-cta:after{position:absolute;top:-55%;bottom:-55%;left:-42%;width:22%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);content:'';transform:skewX(-23deg);animation:hero-cta-shine 4.2s ease-in-out infinite}.luxury-primary-cta:hover,.luxury-primary-cta:focus-visible{background:linear-gradient(135deg,#ead2a2 0%,#bd9862 48%,#85603c 100%);box-shadow:0 7px 0 #49311f,0 18px 38px rgba(0,0,0,.36),inset 0 1px 1px rgba(255,255,255,.55);filter:saturate(1.08);transform:perspective(700px) rotateX(0) translateY(7px)}.luxury-primary-cta:active{box-shadow:0 2px 0 #49311f,0 7px 18px rgba(0,0,0,.28);transform:perspective(700px) translateY(12px)}.luxury-primary-cta span{animation:hero-cta-arrow 2.4s ease-in-out infinite}@keyframes hero-cta-arrow{50%{transform:translateX(3px)}}@keyframes hero-cta-shine{0%,58%{left:-42%}82%,100%{left:122%}}@media(prefers-reduced-motion:reduce){.luxury-primary-cta:after,.luxury-primary-cta span{animation:none!important}}`;
+  useEffect(() => {
+    let active = true;
 
-const galleryExperienceCss = `.gallery-grid-luxury img:nth-child(n+7){display:none}.gallery-preview-link{display:inline-flex;margin-top:27px;padding:14px 20px;border:1px solid #9c7840;color:#211b15;font-size:10px;font-weight:700;letter-spacing:1.5px;text-decoration:none}.gallery-preview-link:hover{background:#211b15;color:#fff}.gallery-page{min-height:100vh;background:#f4f0e8}.gallery-page-header{position:relative;height:92px;background:#17140f;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 7vw}.gallery-page-header nav{display:flex;gap:24px}.gallery-page-header a{color:inherit;text-decoration:none;font-size:10px;letter-spacing:1.2px}.gallery-page-main{padding:80px 8vw}.gallery-page-title{max-width:680px;margin-bottom:46px}.gallery-page-title h1{font:500 clamp(47px,6vw,76px)/1 var(--serif);margin:0}.gallery-page-title p{color:#625b52;line-height:1.8;max-width:500px;margin-top:20px}.gallery-page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.gallery-page-grid button{border:0;padding:0;background:#000;overflow:hidden;cursor:zoom-in}.gallery-page-grid img{display:block;width:100%;height:235px;object-fit:cover;transition:transform .45s}.gallery-page-grid button:hover img{transform:scale(1.08)}.gallery-lightbox{position:fixed;z-index:100;inset:0;display:flex;align-items:center;justify-content:center;padding:38px 100px 132px;background:rgba(8,7,8,.96)}.gallery-lightbox-main{max-width:min(1100px,78vw);max-height:72vh;object-fit:contain}.gallery-lightbox-close,.gallery-lightbox-nav{position:absolute;border:1px solid rgba(255,255,255,.38);background:rgba(255,255,255,.08);color:#fff;cursor:pointer}.gallery-lightbox-close{top:24px;right:28px;width:42px;height:42px;font-size:28px}.gallery-lightbox-nav{top:50%;width:48px;height:48px;border-radius:50%;font-size:21px}.gallery-lightbox-nav.prev{left:28px}.gallery-lightbox-nav.next{right:28px}.gallery-lightbox-thumbs{position:absolute;right:5vw;bottom:29px;left:5vw;display:flex;justify-content:center;gap:9px;overflow:auto;padding:4px}.gallery-lightbox-thumbs button{flex:0 0 78px;height:53px;padding:0;border:2px solid transparent;background:none;opacity:.55;cursor:pointer}.gallery-lightbox-thumbs button.active{border-color:#d7ae6b;opacity:1}.gallery-lightbox-thumbs img{width:100%;height:100%;object-fit:cover}.gallery-lightbox-counter{position:absolute;top:36px;left:32px;color:#e4c48e;font-size:11px;letter-spacing:2px}@media(max-width:800px){.gallery-page-header{height:74px;padding:0 6vw}.gallery-page-header nav{gap:13px}.gallery-page-main{padding:52px 6vw}.gallery-page-grid{grid-template-columns:repeat(2,1fr);gap:9px}.gallery-page-grid img{height:175px}.gallery-lightbox{padding:25px 15px 118px}.gallery-lightbox-main{max-width:100%;max-height:67vh}.gallery-lightbox-nav{top:auto;bottom:80px;width:38px;height:38px}.gallery-lightbox-nav.prev{left:18px}.gallery-lightbox-nav.next{right:18px}.gallery-lightbox-thumbs{right:62px;bottom:16px;left:62px}.gallery-lightbox-thumbs button{flex-basis:60px;height:43px}.gallery-lightbox-counter{top:23px;left:19px}.gallery-lightbox-close{top:15px;right:15px}}`;
+    (async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (!res.ok) throw new Error('gallery API unavailable');
+        const data = await res.json();
+        if (active && Array.isArray(data) && data.length > 0) {
+          setImages(data.map((item, index) => ({
+            id: item.id || `api-${index}`,
+            src: `/uploads/gallery/${item.filename}`,
+            title: item.title || '',
+          })));
+          return;
+        }
+        throw new Error('empty gallery');
+      } catch {
+        if (active) {
+          setImages(fallbackGallery.map((src, index) => ({ id: `local-${index}`, src, title: '' })));
+        }
+      }
+    })();
 
-const galleryEnhancementCss = `.gallery-grid-luxury{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-height:none}.gallery-grid-luxury img{height:285px;animation:gallery-tile-in .7s both}.gallery-grid-luxury img:nth-child(2){animation-delay:.08s}.gallery-grid-luxury img:nth-child(3){animation-delay:.16s}.gallery-grid-luxury img:nth-child(4){animation-delay:.24s}.gallery-grid-luxury img:nth-child(5){animation-delay:.32s}.gallery-grid-luxury img:nth-child(6){animation-delay:.4s}.gallery-page-main{animation:gallery-page-rise .8s ease both}.gallery-page-title .eyebrow{animation:gallery-page-rise .55s .08s both}.gallery-page-title h1{animation:gallery-page-rise .7s .16s both}.gallery-page-title>p:last-child{animation:gallery-page-rise .7s .27s both}.gallery-page-grid button{position:relative;border-radius:2px;box-shadow:0 14px 28px rgba(40,28,15,.1);animation:gallery-tile-in .75s both}.gallery-page-grid button:after{position:absolute;inset:0;background:linear-gradient(0deg,rgba(20,14,10,.45),transparent 46%);content:'';opacity:0;transition:opacity .35s}.gallery-page-grid button:hover:after{opacity:1}.gallery-page-grid button:nth-child(2){animation-delay:.07s}.gallery-page-grid button:nth-child(3){animation-delay:.14s}.gallery-page-grid button:nth-child(4){animation-delay:.21s}.gallery-page-grid button:nth-child(5){animation-delay:.28s}.gallery-page-grid button:nth-child(6){animation-delay:.35s}.gallery-page-grid button:nth-child(7){animation-delay:.42s}.gallery-page-grid button:nth-child(8){animation-delay:.49s}.gallery-page-grid button:nth-child(9){animation-delay:.56s}.gallery-page-grid button:nth-child(10){animation-delay:.63s}.gallery-page-grid img{transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s}.gallery-page-grid button:hover img{transform:scale(1.1);filter:saturate(1.13)}.gallery-page-header{box-shadow:0 8px 25px rgba(0,0,0,.16)}@keyframes gallery-tile-in{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes gallery-page-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@media(max-width:800px){.gallery-grid-luxury{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.gallery-grid-luxury img{height:190px}}@media(prefers-reduced-motion:reduce){.gallery-grid-luxury img,.gallery-page-main,.gallery-page-title .eyebrow,.gallery-page-title h1,.gallery-page-title>p:last-child,.gallery-page-grid button{animation:none!important}}`;
+    return () => { active = false; };
+  }, []);
 
-const experiencePolishCss = `.about-luxury{align-items:center}.about-copy .text-link{display:inline-flex;align-items:center;gap:18px;margin-top:12px;padding:17px 20px;border:1px solid #a38355;background:#1d1813;color:#fff8eb;box-shadow:0 10px 22px rgba(32,24,15,.16);transition:transform .25s,box-shadow .25s,background .25s}.about-copy .text-link:hover{background:#9d7a45;box-shadow:0 16px 28px rgba(32,24,15,.2);transform:translateY(-3px)}.about-copy .text-link span{margin:0;color:#fff8eb}.about-badge{width:205px;height:205px;padding:22px 17px;background:#17140f;font-size:20px;line-height:1.1;box-shadow:0 16px 30px rgba(23,20,15,.18)}.about-badge small{display:block;margin:12px auto 0;max-width:155px;color:#e4d7c5;font:10px/1.45 var(--sans);letter-spacing:0}.gallery-preview-panel{display:flex;align-items:center;justify-content:space-between;gap:28px;margin-top:28px;padding:27px 30px;border-top:1px solid #d2c4b2;border-bottom:1px solid #d2c4b2}.gallery-preview-panel p{max-width:450px;margin:0;color:#64594e;font:14px/1.75 var(--sans)}.gallery-preview-link{position:relative;margin:0!important;min-width:194px;justify-content:center;overflow:hidden;background:#17140f;color:#fff8eb!important;border-color:#17140f!important;box-shadow:0 12px 24px rgba(23,20,15,.15);transition:transform .25s,box-shadow .25s,background .25s!important}.gallery-preview-link:hover{background:#9d7a45!important;box-shadow:0 16px 28px rgba(23,20,15,.2);transform:translateY(-3px)}@media(max-width:800px){.about-badge{width:170px;height:170px;padding:15px 10px;font-size:17px}.about-badge small{max-width:135px;margin-top:8px;font-size:8px}.gallery-preview-panel{align-items:flex-start;flex-direction:column;padding:23px 0}.gallery-preview-link{width:100%}}`;
+  return images;
+}
 
-const sectionRhythmCss = `.gallery.section{padding-bottom:58px}.quote{padding-top:62px}@media(max-width:800px){.gallery.section{padding-bottom:38px}.quote{padding-top:42px}}`;
+function GalleryLightbox({ active, onClose, onChange, images }) {
+  if (active === null || images.length === 0) return null;
+  const go = direction => onChange((active + direction + images.length) % images.length);
+  const image = images[active];
 
-function GalleryLightbox({ active, onClose, onChange }) {
-  if (active === null) return null;
-  const go = direction => onChange((active + direction + gallery.length) % gallery.length);
-  return <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Gallery preview" onClick={onClose}><button className="gallery-lightbox-close" aria-label="Close preview" onClick={onClose}>&times;</button><p className="gallery-lightbox-counter">{String(active + 1).padStart(2, '0')} / {String(gallery.length).padStart(2, '0')}</p><button className="gallery-lightbox-nav prev" aria-label="Previous image" onClick={event => { event.stopPropagation(); go(-1); }}>&larr;</button><img className="gallery-lightbox-main" src={gallery[active]} alt={`KPS INN gallery ${active + 1}`} onClick={event => event.stopPropagation()}/><button className="gallery-lightbox-nav next" aria-label="Next image" onClick={event => { event.stopPropagation(); go(1); }}>&rarr;</button><div className="gallery-lightbox-thumbs" onClick={event => event.stopPropagation()}>{gallery.map((image, index) => <button className={index === active ? 'active' : ''} aria-label={`Preview image ${index + 1}`} onClick={() => onChange(index)} key={image}><img src={image} alt=""/></button>)}</div></div>;
+  return (
+    <div className="gallery-lightbox" role="dialog" aria-modal="true" aria-label="Gallery preview" onClick={onClose}>
+      <button className="gallery-lightbox-close" aria-label="Close preview" onClick={onClose}>×</button>
+      <p className="gallery-lightbox-counter">{String(active + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</p>
+      <button className="gallery-lightbox-nav prev" aria-label="Previous image" onClick={event => { event.stopPropagation(); go(-1); }}>&larr;</button>
+      <img className="gallery-lightbox-main" src={image.src} alt={`KPS INN gallery ${active + 1}`} onClick={event => event.stopPropagation()} />
+      <button className="gallery-lightbox-nav next" aria-label="Next image" onClick={event => { event.stopPropagation(); go(1); }}>&rarr;</button>
+      <div className="gallery-lightbox-thumbs" onClick={event => event.stopPropagation()}>
+        {images.map((thumb, index) => (
+          <button className={index === active ? 'active' : ''} aria-label={`Preview image ${index + 1}`} onClick={() => onChange(index)} key={thumb.id}>
+            <img src={thumb.src} alt="" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HomePage() {
+  const goToBooking = useGoToBooking();
+  const images = useGalleryImages();
+  const [lightbox, setLightbox] = useState(null);
+
+  useEffect(() => { performPendingContactScroll(); }, []);
+
+  return (
+    <>
+      <SiteHeader />
+      <main id="top">
+        <HeroSlider onBook={goToBooking} />
+        <style>{galleryExperienceCss}{galleryEnhancementCss}{experiencePolishCss}{sectionRhythmCss}</style>
+        <AvailabilitySearch />
+
+        <section className="section about-luxury" id="about">
+          <div className="about-copy">
+            <p className="about-kicker">KPS INN</p>
+            <p className="eyebrow dark">WHY GUESTS CHOOSE KPS INN</p>
+            <h2>More than a stay.<br /><i>A place you'll want to return to.</i></h2>
+            <p>From the moment you arrive, every detail is thoughtfully designed to make you feel welcomed, relaxed, and completely at home. Whether you're visiting for business or leisure, KPS INN offers warm hospitality, elegant comfort, and memorable experiences that keep guests coming back.</p>
+            <div className="about-features">
+              <div className="about-feature"><b>Thoughtful Comfort</b><span>Elegant rooms, premium amenities, and peaceful interiors designed to help you relax and enjoy every moment of your stay.</span></div>
+              <div className="about-feature"><b>Hospitality That Cares</b><span>Our dedicated team is always ready to provide attentive service, ensuring every guest feels valued, comfortable, and well cared for.</span></div>
+            </div>
+            <Link className="text-link" to="/" onClick={event => { event.preventDefault(); goToBooking(); }}>EXPLORE OUR ROOMS <span>-&gt;</span></Link>
+          </div>
+          <div className="about-visual">
+            <img src={hotelLobby} alt="KPS INN reception and guest space" />
+            <div className="about-badge">Comfort.<br />Care.<br />Memories.<small>Every stay is thoughtfully crafted to leave you with moments you'll always remember.</small></div>
+          </div>
+        </section>
+
+        <section className="image-break">
+          <img src={hotelBuilding} alt="KPS INN guest space" />
+          <div><p>SIMPLE SERVICE, DONE WELL</p><h2>Clean rooms.<br /><i>Clear communication.</i></h2></div>
+        </section>
+
+        <section className="amenities">
+          <div className="amenity-photo" style={{ backgroundImage: `url(${poolLayout})` }}></div>
+          <div className="amenity-copy">
+            <p className="eyebrow">GUEST COMFORTS</p>
+            <h2>Useful amenities,<br /><i>thoughtfully provided.</i></h2>
+            <div className="amenity-list">
+              <p><Icon>*</Icon> Free Wi-Fi</p>
+              <p><Icon>*</Icon> Parking Facility</p>
+              <p><Icon>*</Icon> Guest Support</p>
+              <p><Icon>*</Icon> Clean Rooms</p>
+              <p><Icon>*</Icon> 24 Hour Reception</p>
+            </div>
+            <a className="outline-button" href="#contact">CONTACT OUR TEAM <span>-&gt;</span></a>
+          </div>
+        </section>
+
+        <section className="gallery section" id="gallery">
+          <div className="section-title">
+            <div>
+              <p className="eyebrow dark">A GLIMPSE INSIDE</p>
+              <h2>Explore <i>KPS INN.</i></h2>
+            </div>
+            <p>A curated preview of the rooms and spaces waiting for you. Discover the complete collection in our gallery.</p>
+          </div>
+          <div className="gallery-grid-luxury">
+            {images.length > 0
+              ? images.map((image, index) => <img loading="lazy" src={image.src} onClick={() => setLightbox(index)} alt={`KPS INN gallery ${index + 1}`} key={image.id} />)
+              : <div>Loading gallery...</div>}
+          </div>
+          <div className="gallery-preview-panel">
+            <p>Every space has its own story. Step inside the complete KPS INN collection and find the details that will make your stay feel special.</p>
+            <Link className="gallery-preview-link" to="/gallery">VIEW ALL PHOTOS &rarr;</Link>
+          </div>
+        </section>
+
+        <section className="quote">
+          <p className="eyebrow dark">KPS INN</p>
+          <blockquote>"Our team focuses on simple service done well: clean rooms, clear communication, and a stay that feels relaxed."</blockquote>
+          <p className="guest">KARUR, TAMIL NADU</p>
+        </section>
+
+        <section className="contact-cta section" id="contact">
+          <p className="eyebrow dark">RESERVE YOUR ROOM</p>
+          <h2>Plan a comfortable<br /><i>stay.</i></h2>
+          <p className="contact-summary">Check-in: 12:00 PM &nbsp; / &nbsp; Check-out: 11:00 AM<br />+91 99449 32516</p>
+          <button className="gold-button" onClick={goToBooking}>REQUEST BOOKING <span>-&gt;</span></button>
+        </section>
+      </main>
+
+      <footer id="footer">
+        <div className="footer-brand">
+          <img className="crest" src={logo} alt="KPS INN logo" /><b>KPS INN</b><i>Comfortable rooms and friendly service</i>
+        </div>
+        <div>
+          <p>CONTACT</p>
+          <a href="tel:+919944932516">+91 99449 32516</a>
+          <a href="https://www.google.com/maps/search/?api=1&query=X375%2B6R9%20Karur%2C%20Tamil%20Nadu" target="_blank" rel="noreferrer">View Location ↗</a>
+        </div>
+        <div>
+          <p>VISIT</p>
+          <address>#5/285/1, Ashok Nagar,<br />Kovai Road, Karur-639002.</address>
+        </div>
+        <div>
+          <p>RECEPTION</p>
+          <span>Open 24 hours for guest assistance.</span>
+          <p>GST No: 33AHUPA9066B4ZB</p>
+        </div>
+        <small>© 2026 KPS INN. ALL RIGHTS RESERVED.</small>
+      </footer>
+
+      <a href="tel:+919944932516" className="whatsapp" aria-label="Call KPS INN">☎</a>
+      <GalleryLightbox active={lightbox} onClose={() => setLightbox(null)} onChange={setLightbox} images={images} />
+    </>
+  );
 }
 
 function GalleryPage() {
   const [active, setActive] = useState(null);
-  useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); const style = document.createElement('style'); style.textContent = galleryEnhancementCss; document.head.appendChild(style); return () => style.remove(); }, []);
-  return <div className="gallery-page"><style>{galleryExperienceCss}</style><header className="gallery-page-header"><Link className="brand" to="/"><img className="hotel-logo" src={logo} alt="KPS INN logo"/><span><b>KPS INN</b><i>Comfortable rooms and friendly service</i></span></Link><nav><Link to="/">Home</Link><Link to="/rooms">Rooms</Link><Link to="/about">About</Link></nav></header><main className="gallery-page-main"><div className="gallery-page-title"><p className="eyebrow dark">KPS INN IN PICTURES</p><h1>Moments of <i>comfort.</i></h1><p>Take a closer look at the rooms, guest spaces, and details that shape a relaxed stay at KPS INN.</p></div><div className="gallery-page-grid">{gallery.map((image, index) => <button onClick={() => setActive(index)} key={image}><img loading="lazy" src={image} alt={`KPS INN gallery ${index + 1}`}/></button>)}</div></main><GalleryLightbox active={active} onClose={() => setActive(null)} onChange={setActive}/></div>;
+  const images = useGalleryImages();
+
+  useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); }, []);
+
+  return (
+    <div>
+      <style>{galleryExperienceCss}{galleryEnhancementCss}{experiencePolishCss}{sectionRhythmCss}</style>
+      <SiteHeader />
+      <main className="gallery-page-main">
+        <div className="gallery-page-title">
+          <p className="eyebrow dark">KPS INN IN PICTURES</p>
+          <h1>Moments of <i>comfort.</i></h1>
+          <p>Take a closer look at the rooms, guest spaces, and details that shape a relaxed stay at KPS INN.</p>
+        </div>
+        <div className="gallery-page-grid">
+          {images.length > 0
+            ? images.map((image, index) => (
+                <button onClick={() => setActive(index)} key={image.id}>
+                  <img loading="lazy" src={image.src} alt={`KPS INN gallery ${index + 1}`} />
+                </button>
+              ))
+            : <div>Loading gallery...</div>}
+        </div>
+      </main>
+      <GalleryLightbox active={active} onClose={() => setActive(null)} onChange={setActive} images={images} />
+    </div>
+  );
 }
 
-function HeroSlider({ onBook }) {
-  const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const touchStart = useRef(null);
-  const changeSlide = direction => setActive(current => (current + direction + heroSlides.length) % heroSlides.length);
-  useEffect(() => { if (paused) return undefined; const timer = setInterval(() => changeSlide(1), 5000); return () => clearInterval(timer); }, [paused]);
-  useEffect(() => { const style = document.createElement('style'); style.textContent = heroCtaCss; document.head.appendChild(style); return () => style.remove(); }, []);
-  const handleTouchEnd = event => { if (touchStart.current === null) return; const distance = event.changedTouches[0].clientX - touchStart.current; if (Math.abs(distance) > 45) changeSlide(distance > 0 ? -1 : 1); touchStart.current = null; };
-  return <section className="luxury-hero-slider" aria-label="KPS INN highlights" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onTouchStart={event => { touchStart.current = event.touches[0].clientX; }} onTouchEnd={handleTouchEnd}><style>{heroSliderCss}</style><div className="luxury-hero-slides">{heroSlides.map((slide, index) => <article className={`luxury-hero-slide ${slide.motion} ${index === active ? 'is-active' : ''}`} aria-hidden={index !== active} key={slide.title}><img src={slide.image} alt="" fetchPriority={index === 0 ? 'high' : 'low'} loading={index === 0 ? 'eager' : 'lazy'}/><div className="luxury-hero-overlay"/><div className="luxury-hero-copy"><p className="luxury-hero-kicker">{slide.eyebrow}</p><h1>{slide.title}</h1><p className="luxury-hero-description">{slide.copy}</p><div className="luxury-hero-actions">{slide.book ? <button className="luxury-primary-cta" onClick={onBook}>{slide.primary}<span>&rarr;</span></button> : <Link className="luxury-primary-cta" to={slide.to}>{slide.primary}<span>&rarr;</span></Link>}{slide.secondary && <Link className="luxury-secondary-cta" to={slide.to}>{slide.secondary}</Link>}</div></div></article>)}</div><div className="luxury-hero-controls"><button className="luxury-slider-arrow" aria-label="Previous slide" onClick={() => changeSlide(-1)}>&larr;</button><div className="luxury-slider-pagination" aria-label="Select slide">{heroSlides.map((slide, index) => <button className={index === active ? 'is-active' : ''} aria-label={`Go to slide ${index + 1}`} aria-current={index === active ? 'true' : undefined} onClick={() => setActive(index)} key={slide.title}><span/></button>)}</div><button className="luxury-slider-arrow" aria-label="Next slide" onClick={() => changeSlide(1)}>&rarr;</button></div><p className="luxury-hero-count"><b>0{active + 1}</b><span>/ 0{heroSlides.length}</span></p></section>;
+function RoomRoute() {
+  const { slug } = useParams();
+  return <RoomDetailsPage slug={slug} />;
 }
 
-function App() {
-  const [scrolled, setScrolled] = useState(false);
-  const [menu, setMenu] = useState(false);
-  const [lightbox, setLightbox] = useState(null);
-  const navigate = useNavigate();
-  useEffect(() => { const handler = () => setScrolled(scrollY > 30); addEventListener('scroll', handler); return () => removeEventListener('scroll', handler); }, []);
-  const searchRooms = () => navigate('/rooms');
-  return <>
-    <header className={scrolled ? 'scrolled' : ''}>
-      <a className="brand" href="#top" aria-label="KPS INN home"><img className="hotel-logo" src={logo} alt="KPS INN logo"/><span><b>KPS INN</b><i>Comfortable rooms and friendly service</i></span></a>
-      <button className="hamburger" onClick={() => setMenu(!menu)} aria-label="Toggle menu">Menu</button>
-      <nav className={menu ? 'open' : ''}>{[
-        { label: 'Home', href: '/' },
-        { label: 'About', href: '/about' },
-        { label: 'Rooms', href: '/rooms' },
-        { label: 'Gallery', href: '/gallery' },
-        { label: 'Booking', href: '/rooms' },
-        { label: 'Contact', href: '/#contact' }
-      ].map(item => item.href.startsWith('/') ? <Link onClick={() => setMenu(false)} to={item.href} key={item.label}>{item.label}</Link> : <a onClick={() => setMenu(false)} href={item.href} key={item.label}>{item.label}</a>)}<button onClick={() => { setMenu(false); searchRooms(); }}>BOOK NOW <span>-&gt;</span></button></nav>
-    </header>
-    <main id="top">
-      <HeroSlider onBook={searchRooms}/><style>{galleryExperienceCss}{galleryEnhancementCss}{experiencePolishCss}{sectionRhythmCss}</style>
-      <section className="hero"><div className="hero-image" style={{ backgroundImage: `url(${reception})` }}></div><div className="hero-shade"></div><div className="hero-copy"><p className="eyebrow">COMFORTABLE ROOMS AND FRIENDLY SERVICE</p><h1>KPS INN<br/><i>Karur, Tamil Nadu.</i></h1><p className="intro">Clean rooms, dependable hospitality, and a peaceful stay for families, business travelers, and guests visiting Tamil Nadu.</p><Link className="outline-button" to="/rooms">EXPLORE ROOMS <span>→</span></Link></div><div className="hero-side"><span>SCROLL TO DISCOVER</span><b>01 <i>/ 06</i></b></div></section>
-      <section className="section about-luxury" id="about"><div className="about-copy"><p className="about-kicker">KPS INN</p><p className="eyebrow dark">WHY GUESTS CHOOSE KPS INN</p><h2>More than a stay.<br/><i>A place you'll want to return to.</i></h2><p>From the moment you arrive, every detail is thoughtfully designed to make you feel welcomed, relaxed, and completely at home. Whether you're visiting for business or leisure, KPS INN offers warm hospitality, elegant comfort, and memorable experiences that keep guests coming back.</p><div className="about-features"><div className="about-feature"><b>Thoughtful Comfort</b><span>Elegant rooms, premium amenities, and peaceful interiors designed to help you relax and enjoy every moment of your stay.</span></div><div className="about-feature"><b>Hospitality That Cares</b><span>Our dedicated team is always ready to provide attentive service, ensuring every guest feels valued, comfortable, and well cared for.</span></div></div><Link className="text-link" to="/rooms">EXPLORE OUR ROOMS <span>-&gt;</span></Link></div><div className="about-visual"><img src={hotelLobby} alt="KPS INN reception and guest space"/><div className="about-badge">Comfort.<br/>Care.<br/>Memories.<small>Every stay is thoughtfully crafted to leave you with moments you'll always remember.</small></div></div></section>
-      <section className="image-break"><img src={hotelBuilding} alt="KPS INN guest space"/><div><p>SIMPLE SERVICE, DONE WELL</p><h2>Clean rooms.<br/><i>Clear communication.</i></h2></div></section>
-      <section className="amenities"><div className="amenity-photo" style={{ backgroundImage: `url(${poolLayout})` }}></div><div className="amenity-copy"><p className="eyebrow">GUEST COMFORTS</p><h2>Useful amenities,<br/><i>thoughtfully provided.</i></h2><div className="amenity-list"><p><Icon>*</Icon> Free Wi-Fi</p><p><Icon>*</Icon> Parking Facility</p><p><Icon>*</Icon> Guest Support</p><p><Icon>*</Icon> Clean Rooms</p><p><Icon>*</Icon> 24 Hour Reception</p></div><a className="outline-button" href="#contact">CONTACT OUR TEAM <span>-&gt;</span></a></div></section>
-      <section className="gallery section" id="gallery"><div className="section-title"><div><p className="eyebrow dark">A GLIMPSE INSIDE</p><h2>Explore <i>KPS INN.</i></h2></div><p>A curated preview of the rooms and spaces waiting for you. Discover the complete collection in our gallery.</p></div><div className="gallery-grid-luxury">{gallery.map((image, index) => <img loading="lazy" src={image} onClick={() => setLightbox(index)} alt={`KPS INN gallery ${index + 1}`} key={image}/>)}</div><div className="gallery-preview-panel"><p>Every space has its own story. Step inside the complete KPS INN collection and find the details that will make your stay feel special.</p><Link className="gallery-preview-link" to="/gallery">VIEW ALL PHOTOS &rarr;</Link></div></section>
-      <section className="quote"><p className="eyebrow dark">KPS INN</p><blockquote>“Our team focuses on simple service done well: clean rooms, clear communication, and a stay that feels relaxed.”</blockquote><p className="guest">KARUR, TAMIL NADU</p></section>
-      <section className="contact-cta section" id="contact"><p className="eyebrow dark">RESERVE YOUR ROOM</p><h2>Plan a comfortable<br/><i>stay.</i></h2><p className="contact-summary">Check-in: 12:00 PM &nbsp; / &nbsp; Check-out: 11:00 AM<br/>+91 99449 32516</p><button className="gold-button" onClick={searchRooms}>REQUEST BOOKING <span>-&gt;</span></button></section>
-    </main>
-    <footer><div className="footer-brand"><img className="crest" src={logo} alt="KPS INN logo"/><b>KPS INN</b><i>Comfortable rooms and friendly service</i></div><div><p>CONTACT</p><a href="tel:+919944932516">+91 99449 32516</a><a href="https://www.google.com/maps/search/?api=1&query=X375%2B6R9%20Karur%2C%20Tamil%20Nadu" target="_blank" rel="noreferrer">View Location ↗</a></div><div><p>VISIT</p><address>#5/285/1, Ashok Nagar,<br/>Kovai Road, Karur-639002.</address></div><div><p>RECEPTION</p><span>Open 24 hours for guest assistance.</span><p>GST No: 33AHUPA9066B4ZB</p></div><small>© 2026 KPS INN. ALL RIGHTS RESERVED.</small></footer>
-    <a href="tel:+919944932516" className="whatsapp" aria-label="Call KPS INN">☎</a>
-    <GalleryLightbox active={lightbox} onClose={() => setLightbox(null)} onChange={setLightbox}/>
-  </>;
+function RouterApp() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/gallery" element={<GalleryPage />} />
+      <Route path="/rooms/:slug" element={<RoomRoute />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+    </Routes>
+  );
 }
 
-function RoomRoute(){ const { slug } = useParams(); return <RoomDetailsPage slug={slug}/>; }
-const buttonPolishCss = `button,a{ -webkit-tap-highlight-color:transparent }.gold-button,.outline-button,.gallery-preview-link,.about-copy .text-link,.room-link.view-details,.related button,header nav button{position:relative;isolation:isolate;overflow:hidden;transition:transform .24s ease,box-shadow .24s ease,background .24s ease,border-color .24s ease!important}.gold-button:before,.outline-button:before,.gallery-preview-link:before,.about-copy .text-link:before,.room-link.view-details:before,.related button:before,header nav button:before{position:absolute;z-index:-1;top:-55%;bottom:-55%;left:-38%;width:20%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);content:'';transform:skewX(-22deg);transition:left .55s ease}.gold-button:hover:before,.outline-button:hover:before,.gallery-preview-link:hover:before,.about-copy .text-link:hover:before,.room-link.view-details:hover:before,.related button:hover:before,header nav button:hover:before{left:120%}.gold-button:hover,.outline-button:hover,.gallery-preview-link:hover,.about-copy .text-link:hover,.room-link.view-details:hover,.related button:hover,header nav button:hover{transform:translateY(-3px);box-shadow:0 13px 24px rgba(31,22,14,.2)}.gold-button:active,.outline-button:active,.gallery-preview-link:active,.about-copy .text-link:active,.room-link.view-details:active,.related button:active,header nav button:active{transform:translateY(1px);box-shadow:0 5px 11px rgba(31,22,14,.16)}.gold-button:focus-visible,.outline-button:focus-visible,.gallery-preview-link:focus-visible,.about-copy .text-link:focus-visible,.room-link.view-details:focus-visible,.related button:focus-visible,header nav button:focus-visible,.gallery-lightbox-nav:focus-visible,.luxury-slider-arrow:focus-visible,.guest-selector button:focus-visible{outline:2px solid #ebca8a;outline-offset:4px}.room-link.view-details{padding:14px 16px;border:1px solid rgba(157,122,69,.35);background:#fffaf2}.room-link.view-details:hover{background:#1d1813;color:#fff}.related button{border:1px solid #cdbb9d;background:#fffaf2;color:#251c14}.related button:hover{border-color:#a37a40;background:#9d7a45;color:#fff}.guest-selector button,.guest-control button{border-radius:50%;transition:transform .2s,background .2s,box-shadow .2s}.guest-selector button:hover,.guest-control button:hover{background:#b7935a;color:#fff;box-shadow:0 5px 12px rgba(87,56,22,.24);transform:scale(1.1)}.gallery-lightbox-nav,.gallery-lightbox-close,.luxury-slider-arrow{transition:transform .2s,background .2s,border-color .2s}.gallery-lightbox-nav:hover,.gallery-lightbox-close:hover,.luxury-slider-arrow:hover{border-color:#e7c181;background:rgba(184,147,90,.38);transform:scale(1.08)}.luxury-slider-pagination button{transition:transform .2s}.luxury-slider-pagination button:hover{transform:translateY(-2px)}@media(prefers-reduced-motion:reduce){.gold-button,.outline-button,.gallery-preview-link,.about-copy .text-link,.room-link.view-details,.related button,header nav button,.guest-selector button,.guest-control button,.gallery-lightbox-nav,.gallery-lightbox-close,.luxury-slider-arrow{transition:none!important}.gold-button:before,.outline-button:before,.gallery-preview-link:before,.about-copy .text-link:before,.room-link.view-details:before,.related button:before,header nav button:before{display:none}}`;
-const bookingPopupCss = `.modal-backdrop{animation:booking-backdrop-in .32s ease both}.modal{overflow:hidden;animation:booking-modal-in .52s cubic-bezier(.2,.8,.2,1) both}.modal:before{position:absolute;top:0;right:0;left:0;height:3px;background:linear-gradient(90deg,transparent,#d6ab63,transparent);content:'';animation:booking-line-in .8s .2s both}.modal>.eyebrow,.modal h2,.modal .booking-confirmation,.modal form label,.modal form .gold-button,.confirmation{animation:booking-content-in .5s both}.modal h2{animation-delay:.08s}.modal .booking-confirmation{animation-delay:.14s}.modal form label:nth-of-type(1){animation-delay:.17s}.modal form label:nth-of-type(2){animation-delay:.23s}.modal form label:nth-of-type(3){animation-delay:.29s}.modal form label:nth-of-type(4){animation-delay:.35s}.modal form .gold-button{animation-delay:.42s}.confirmation{animation-delay:.12s}.confirmation>span{display:inline-grid;place-items:center;width:58px;height:58px;border-radius:50%;background:#f0e4cf;animation:booking-success-pop .65s .24s cubic-bezier(.2,1.4,.4,1) both}@keyframes booking-backdrop-in{from{opacity:0}to{opacity:1}}@keyframes booking-modal-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes booking-line-in{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}@keyframes booking-content-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes booking-success-pop{from{opacity:0;transform:scale(.35) rotate(-12deg)}to{opacity:1;transform:scale(1) rotate(0)}}@media(prefers-reduced-motion:reduce){.modal-backdrop,.modal,.modal:before,.modal>.eyebrow,.modal h2,.modal .booking-confirmation,.modal form label,.modal form .gold-button,.confirmation,.confirmation>span{animation:none!important}}`;
-function GlobalButtonPolish(){ return <><style>{buttonPolishCss}</style><style>{bookingPopupCss}</style></>; }
-function RouterApp(){ return <><GlobalButtonPolish/><Routes><Route path="/" element={<App/>}/><Route path="/rooms" element={<RoomsPage/>}/><Route path="/about" element={<AboutPage/>}/><Route path="/gallery" element={<GalleryPage/>}/><Route path="/rooms/:slug" element={<RoomRoute/>}/></Routes><BookingPopup/></>; }
-function SiteEntry(){ const [loading, setLoading] = useState(true); return <>{loading ? <SplashScreen onComplete={() => setLoading(false)}/> : <RouterApp/>}</>; }
-createRoot(document.getElementById('root')).render(<BrowserRouter basename={import.meta.env.BASE_URL}><BookingProvider><SiteEntry/></BookingProvider></BrowserRouter>);
+function SiteEntry() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <>
+      {loading ? <SplashScreen onComplete={() => setLoading(false)} /> : <RouterApp />}
+      <style>{bookingPopupCss}</style>
+      <BookingPopup />
+    </>
+  );
+}
+
+createRoot(document.getElementById('root')).render(
+  <BookingProvider>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <SiteEntry />
+    </BrowserRouter>
+  </BookingProvider>
+);
