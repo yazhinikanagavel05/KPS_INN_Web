@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGoToBooking } from '../lib/bookingNav';
 import SiteHeader from './SiteHeader';
+import logo from '../assets/logo/kps-inn-logo.png';
 import reception from '../assets/gallery/hero-luxury.png';
 import hotelLobby from '../assets/gallery/hotel-lobby.jpg';
 import hotelBuilding from '../assets/gallery/hotel-building.jpg';
